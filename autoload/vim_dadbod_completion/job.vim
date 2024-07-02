@@ -27,6 +27,13 @@ function! s:nvim_job_cb(jobid, data, event) dict abort
 endfunction
 
 function! vim_dadbod_completion#job#run(cmd, callback, stdin) abort
+  if get(a:cmd, 0, '') ==# 'env' && !executable('env')
+    call remove(a:cmd, 0)
+    while get(a:cmd, 0) =~# '^\w\+='
+      call remove(a:cmd, 0)
+    endwhile
+  endif
+
   if has('nvim')
     let jobid = jobstart(a:cmd, {
           \ 'on_stdout': function('s:nvim_job_cb'),
